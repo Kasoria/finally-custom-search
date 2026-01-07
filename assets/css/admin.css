@@ -1,0 +1,280 @@
+/**
+ * Custom Facet Search - Admin Styles
+ */
+
+/* ==========================================================================
+   General Admin Styles
+   ========================================================================== */
+
+.cfs-admin-wrap {
+    max-width: 1200px;
+}
+
+.cfs-admin-wrap h1 {
+    margin-bottom: 1.5rem;
+}
+
+.cfs-admin-wrap .required {
+    color: #d63638;
+}
+
+/* ==========================================================================
+   Facets Table
+   ========================================================================== */
+
+.cfs-facets-table {
+    margin-top: 1.5rem;
+}
+
+.cfs-facets-table .column-name {
+    width: 25%;
+}
+
+.cfs-facets-table .column-type {
+    width: 15%;
+}
+
+.cfs-facets-table .column-source {
+    width: 25%;
+}
+
+.cfs-facets-table .column-shortcode {
+    width: 25%;
+}
+
+.cfs-facets-table .column-actions {
+    width: 10%;
+}
+
+.cfs-facet-slug {
+    color: #666;
+    font-size: 12px;
+}
+
+.cfs-shortcode-display {
+    font-size: 12px;
+    background: #f0f0f1;
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.cfs-copy-shortcode {
+    vertical-align: middle;
+    cursor: pointer;
+    color: #2271b1;
+}
+
+.cfs-copy-shortcode:hover {
+    color: #135e96;
+}
+
+.cfs-no-items {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.cfs-no-items a {
+    margin-left: 0.5rem;
+}
+
+/* ==========================================================================
+   Facet Form
+   ========================================================================== */
+
+.cfs-facet-form {
+    background: #fff;
+    padding: 1.5rem;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    margin-top: 1.5rem;
+}
+
+.cfs-facet-form .form-table th {
+    width: 200px;
+    padding: 15px 10px 15px 0;
+}
+
+.cfs-facet-form .form-table td {
+    padding: 10px;
+}
+
+.cfs-checkbox-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.cfs-checkbox-block {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.cfs-type-settings {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ddd;
+}
+
+.cfs-type-settings h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1d2327;
+}
+
+#cfs-save-result {
+    margin-top: 1rem;
+}
+
+#cfs-save-result .notice {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Meta Key Suggestions
+   ========================================================================== */
+
+.cfs-suggestions {
+    margin-top: 0.75rem;
+}
+
+.cfs-meta-keys-list {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.cfs-meta-key-btn {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+    min-height: auto !important;
+}
+
+/* ==========================================================================
+   Edit Facet
+   ========================================================================== */
+
+.cfs-edit-facet-wrap {
+    background: #fff;
+    padding: 1.5rem;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+
+.cfs-edit-facet-wrap h2 {
+    margin-top: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ==========================================================================
+   Settings Page
+   ========================================================================== */
+
+.cfs-usage-guide {
+    background: #fff;
+    padding: 1.5rem;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.cfs-usage-guide h3 {
+    margin-top: 1.5rem;
+}
+
+.cfs-usage-guide h3:first-child {
+    margin-top: 0;
+}
+
+.cfs-usage-guide pre {
+    background: #f0f0f1;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.cfs-usage-guide code {
+    font-size: 13px;
+}
+
+.cfs-usage-guide ol {
+    margin-left: 1.5rem;
+}
+
+.cfs-usage-guide li {
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   Shortcodes Reference
+   ========================================================================== */
+
+.cfs-shortcodes-reference {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+}
+
+.cfs-shortcodes-reference h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.cfs-shortcodes-reference table {
+    width: 100%;
+}
+
+.cfs-shortcodes-reference td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.cfs-shortcodes-reference td:first-child {
+    width: 50%;
+}
+
+.cfs-shortcodes-reference tr:last-child td {
+    border-bottom: none;
+}
+
+.cfs-shortcodes-reference code {
+    background: #f0f0f1;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+    .cfs-facet-form .form-table th {
+        width: 100%;
+        padding-bottom: 5px;
+    }
+
+    .cfs-facet-form .form-table td {
+        padding-left: 0;
+    }
+
+    .cfs-facets-table .column-shortcode {
+        display: none;
+    }
+
+    .cfs-checkbox-inline {
+        display: flex;
+        margin-bottom: 0.5rem;
+    }
+}

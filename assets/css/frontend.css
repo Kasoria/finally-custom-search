@@ -1,0 +1,768 @@
+/**
+ * Custom Facet Search - Frontend Styles
+ */
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
+.cfs-facet {
+    margin-bottom: 1.5rem;
+}
+
+.cfs-facet-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.cfs-facet-inner {
+    position: relative;
+}
+
+/* ==========================================================================
+   Checkbox & Radio Styles
+   ========================================================================== */
+
+.cfs-checkbox-list,
+.cfs-radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.cfs-checkbox-item,
+.cfs-radio-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    transition: color 0.2s ease;
+}
+
+.cfs-checkbox-item:hover,
+.cfs-radio-item:hover {
+    color: #0073aa;
+}
+
+.cfs-checkbox-item input,
+.cfs-radio-item input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #0073aa;
+}
+
+.cfs-checkbox-label,
+.cfs-radio-label {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.cfs-count {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Dropdown Styles
+   ========================================================================== */
+
+.cfs-dropdown {
+    width: 100%;
+    padding: 0.625rem 2rem 0.625rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cfs-dropdown:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.15);
+}
+
+.cfs-dropdown[multiple] {
+    background-image: none;
+    padding-right: 0.75rem;
+    min-height: 120px;
+}
+
+/* ==========================================================================
+   Range Slider Styles
+   ========================================================================== */
+
+.cfs-range-wrapper {
+    padding: 0.5rem 0;
+}
+
+.cfs-range-slider {
+    height: 8px;
+    margin: 1rem 0.5rem 1.5rem;
+}
+
+/* noUiSlider customization */
+.cfs-facet .noUi-target {
+    background: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+.cfs-facet .noUi-connect {
+    background: #0073aa;
+    border-radius: 4px;
+}
+
+.cfs-facet .noUi-handle {
+    width: 20px;
+    height: 20px;
+    top: -7px;
+    right: -10px;
+    border: 2px solid #0073aa;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    cursor: grab;
+}
+
+.cfs-facet .noUi-handle:before,
+.cfs-facet .noUi-handle:after {
+    display: none;
+}
+
+.cfs-facet .noUi-handle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.3);
+}
+
+.cfs-facet .noUi-handle:active {
+    cursor: grabbing;
+}
+
+/* Range inputs */
+.cfs-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cfs-range-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cfs-range-input {
+    width: 70px;
+    padding: 0.5rem 0.625rem;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -moz-appearance: textfield;
+}
+
+.cfs-range-input::-webkit-outer-spin-button,
+.cfs-range-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.cfs-range-input:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.15);
+}
+
+.cfs-range-input[readonly] {
+    background: #f5f5f5;
+    cursor: default;
+}
+
+.cfs-range-prefix,
+.cfs-range-suffix {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.cfs-range-separator {
+    color: #999;
+    padding: 0 0.25rem;
+}
+
+.cfs-range-reset {
+    margin-left: auto;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: #666;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cfs-range-reset:hover:not(:disabled) {
+    background: #eee;
+    border-color: #ccc;
+}
+
+.cfs-range-reset:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Search Input Styles
+   ========================================================================== */
+
+.cfs-search-wrapper {
+    position: relative;
+}
+
+.cfs-search-input {
+    width: 100%;
+    padding: 0.625rem 2.5rem 0.625rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cfs-search-input:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.15);
+}
+
+.cfs-search-clear {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.cfs-search-clear:hover {
+    color: #333;
+}
+
+.cfs-search-clear .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   Date Input Styles
+   ========================================================================== */
+
+.cfs-date-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cfs-date-input:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.15);
+}
+
+.cfs-date-range {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cfs-date-separator {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Rating Styles
+   ========================================================================== */
+
+.cfs-rating-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cfs-rating-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0;
+}
+
+.cfs-rating-item input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cfs-rating-stars {
+    color: #ffc107;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.cfs-rating-text {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.cfs-rating-item:hover .cfs-rating-text,
+.cfs-rating-item input:checked ~ .cfs-rating-text {
+    color: #333;
+}
+
+/* ==========================================================================
+   Active Filters
+   ========================================================================== */
+
+.cfs-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.cfs-active-filters-label {
+    font-weight: 500;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.cfs-active-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.cfs-filter-label {
+    color: #666;
+}
+
+.cfs-filter-value {
+    font-weight: 500;
+}
+
+.cfs-remove-filter {
+    display: flex;
+    align-items: center;
+    color: #999;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.cfs-remove-filter:hover {
+    color: #d63638;
+}
+
+.cfs-remove-filter .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.cfs-clear-all {
+    margin-left: auto;
+    color: #d63638;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.cfs-clear-all:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Results Wrapper
+   ========================================================================== */
+
+.cfs-results-wrapper {
+    position: relative;
+}
+
+.cfs-results-wrapper.cfs-loading .cfs-results {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.cfs-results-wrapper.cfs-loading .cfs-loading {
+    display: flex;
+}
+
+.cfs-loading {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
+.cfs-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #0073aa;
+    border-radius: 50%;
+    animation: cfs-spin 0.8s linear infinite;
+}
+
+@keyframes cfs-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Results Header
+   ========================================================================== */
+
+.cfs-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cfs-results-count {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.cfs-sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cfs-sort-wrapper label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.cfs-sort-select {
+    padding: 0.4rem 2rem 0.4rem 0.625rem;
+    font-size: 0.85rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23666' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Results Grid
+   ========================================================================== */
+
+.cfs-results {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.cfs-columns-1 { grid-template-columns: 1fr; }
+.cfs-columns-2 { grid-template-columns: repeat(2, 1fr); }
+.cfs-columns-3 { grid-template-columns: repeat(3, 1fr); }
+.cfs-columns-4 { grid-template-columns: repeat(4, 1fr); }
+.cfs-columns-5 { grid-template-columns: repeat(5, 1fr); }
+.cfs-columns-6 { grid-template-columns: repeat(6, 1fr); }
+
+@media (max-width: 992px) {
+    .cfs-columns-4,
+    .cfs-columns-5,
+    .cfs-columns-6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cfs-columns-3,
+    .cfs-columns-4,
+    .cfs-columns-5,
+    .cfs-columns-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .cfs-columns-2,
+    .cfs-columns-3,
+    .cfs-columns-4,
+    .cfs-columns-5,
+    .cfs-columns-6 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Result Item (Default Template)
+   ========================================================================== */
+
+.cfs-result-item {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cfs-result-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.cfs-result-thumbnail {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.cfs-result-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cfs-result-item:hover .cfs-result-thumbnail img {
+    transform: scale(1.05);
+}
+
+.cfs-result-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.cfs-result-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1.3;
+}
+
+.cfs-result-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.cfs-result-title a:hover {
+    color: #0073aa;
+}
+
+.cfs-result-excerpt {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.cfs-result-meta {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* ==========================================================================
+   No Results
+   ========================================================================== */
+
+.cfs-no-results {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.cfs-no-results p {
+    margin: 0 0 1rem;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.cfs-reset-all,
+.cfs-reset-btn {
+    display: inline-block;
+    padding: 0.625rem 1.25rem;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.cfs-reset-all:hover,
+.cfs-reset-btn:hover {
+    background: #005a87;
+    color: #fff;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.cfs-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.cfs-page-numbers {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.cfs-page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cfs-page-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.cfs-page-btn.active {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+}
+
+.cfs-page-dots {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    color: #999;
+}
+
+.cfs-prev,
+.cfs-next {
+    font-weight: 500;
+}
+
+/* Load more */
+.cfs-load-more-wrapper {
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cfs-load-more {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+}
+
+.cfs-pagination-info {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* ==========================================================================
+   Form Wrapper
+   ========================================================================== */
+
+.cfs-form-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.cfs-submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    margin-top: 1.5rem;
+    background: #0073aa;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.cfs-submit-btn:hover {
+    background: #005a87;
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.cfs-no-choices {
+    color: #666;
+    font-size: 0.9rem;
+    font-style: italic;
+}
