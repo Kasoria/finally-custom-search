@@ -62,13 +62,23 @@
                 }
             });
 
+            // Detect Bricks Builder query loops and grids
+            $('[data-query-loop-id], .brxe-loop, .brxe-posts').each((i, el) => {
+                const $el = $(el);
+                const bricksId = $el.attr('data-query-loop-id') || $el.attr('id') || 'bricks-grid-' + i;
+                if (!this.grids[bricksId]) {
+                    this.grids[bricksId] = $el;
+                }
+            });
+
             // Also detect by common CSS selectors used by page builders
             const commonSelectors = [
-                '.jet-listing-grid',      // JetEngine
-                '.wpgb-grid-wrapper',     // WP Grid Builder
-                '[data-loop-grid]',       // Generic loop grid
-                '.elementor-posts',       // Elementor Posts widget
-                '.elementor-loop-container' // Elementor Loop
+                '.jet-listing-grid',        // JetEngine
+                '.wpgb-grid-wrapper',       // WP Grid Builder
+                '[data-loop-grid]',         // Generic loop grid
+                '.elementor-posts',         // Elementor Posts widget
+                '.elementor-loop-container', // Elementor Loop
+                '.cfs-bricks-results-wrapper' // CFS Bricks Results
             ];
 
             commonSelectors.forEach(selector => {
@@ -89,34 +99,50 @@
          */
         getTargetGrid: function($facet) {
             const targetGrid = $facet.data('target-grid');
-            
+
             if (targetGrid) {
                 // Try to find by grid ID first
                 if (this.grids[targetGrid]) {
                     return this.grids[targetGrid];
                 }
-                
+
                 // Try as Elementor widget ID (with or without prefix)
                 const elementorEl = $('[data-id="' + targetGrid + '"]');
                 if (elementorEl.length) {
                     return elementorEl;
                 }
-                
+
                 // Try with elementor-element prefix
                 const withPrefix = $('#elementor-element-' + targetGrid + ', .elementor-element-' + targetGrid);
                 if (withPrefix.length) {
                     return withPrefix;
                 }
-                
-                // Try as CSS selector
-                const cssSelector = $(targetGrid);
-                if (cssSelector.length) {
-                    return cssSelector;
+
+                // Try as Bricks element ID
+                const bricksEl = $('[data-bricks-id="' + targetGrid + '"], #brxe-' + targetGrid + ', .brxe-' + targetGrid);
+                if (bricksEl.length) {
+                    return bricksEl;
+                }
+
+                // Try as Bricks query loop ID
+                const bricksLoop = $('[data-query-loop-id="' + targetGrid + '"]');
+                if (bricksLoop.length) {
+                    return bricksLoop;
+                }
+
+                // Try as CSS selector (ID or class)
+                try {
+                    const cssSelector = $(targetGrid.startsWith('.') || targetGrid.startsWith('#') ? targetGrid : '#' + targetGrid);
+                    if (cssSelector.length) {
+                        return cssSelector;
+                    }
+                } catch (e) {
+                    // Invalid selector, continue
                 }
             }
-            
+
             // Default: find first results wrapper
-            return $('.cfs-results-wrapper').first();
+            return $('.cfs-results-wrapper, .cfs-bricks-results-wrapper').first();
         },
         
         bindEvents: function() {
@@ -701,6 +727,9 @@
                 '.elementor-loop-container',     // Elementor Loop Grid
                 '.elementor-posts-container',    // Elementor Posts
                 '.elementor-grid',               // Elementor generic grid
+                '.brxe-loop',                    // Bricks Loop element
+                '.brxe-posts',                   // Bricks Posts element
+                '[data-query-loop-id]',          // Bricks query loop
                 '.jet-listing-grid__items',      // JetEngine
                 '.wpgb-grid',                    // WP Grid Builder
                 '.e-loop-items',                 // Elementor loop items

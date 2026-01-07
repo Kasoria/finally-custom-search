@@ -46,6 +46,9 @@ final class Custom_Facet_Search {
         require_once CFS_PLUGIN_DIR . 'includes/class-cfs-ajax.php';
         require_once CFS_PLUGIN_DIR . 'includes/class-cfs-shortcodes.php';
         require_once CFS_PLUGIN_DIR . 'includes/class-cfs-widgets.php';
+
+        // Bricks Builder integration
+        require_once CFS_PLUGIN_DIR . 'includes/bricks/class-cfs-bricks.php';
     }
     
     private function init_hooks() {
@@ -67,6 +70,9 @@ final class Custom_Facet_Search {
         CFS_Ajax::instance();
         CFS_Shortcodes::instance();
         CFS_Widgets::instance();
+
+        // Bricks Builder integration
+        CFS_Bricks::instance();
 
         // Hook up debug mode setting
         add_filter('cfs_debug_mode', [$this, 'is_debug_mode']);
