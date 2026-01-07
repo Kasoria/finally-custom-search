@@ -766,3 +766,88 @@
     font-size: 0.9rem;
     font-style: italic;
 }
+
+/* ==========================================================================
+   Client-side Filtering (for Bricks native loops)
+   ========================================================================== */
+
+/* Hidden items during client-side filtering */
+.cfs-hidden {
+    display: none !important;
+}
+
+/* Loading state for any container */
+.cfs-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.cfs-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 100;
+}
+
+.cfs-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #0073aa;
+    border-radius: 50%;
+    animation: cfs-spin 0.8s linear infinite;
+    z-index: 101;
+}
+
+/* No results message for client-side filtering */
+.cfs-no-results-message {
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.cfs-no-results-message p {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   Bricks Builder Specific
+   ========================================================================== */
+
+/* Ensure Bricks loop items transition smoothly */
+[data-cfs-post-id] {
+    transition: opacity 0.3s ease;
+}
+
+/* Bricks facet wrapper */
+.cfs-bricks-facet-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+/* Bricks results wrapper */
+.cfs-bricks-results-wrapper {
+    position: relative;
+}
+
+/* Builder placeholder */
+.cfs-bricks-placeholder {
+    padding: 2rem;
+    text-align: center;
+    background: #f5f5f5;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    color: #666;
+}

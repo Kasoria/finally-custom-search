@@ -407,25 +407,167 @@
 
             this.log('Trigger filter, target grid:', $targetGrid.length ? 'found' : 'not found', $targetGrid);
 
-            // Check for CFS Results elements
+            // Check for CFS Results elements (which support full content replacement)
             const isCFSResultsElement = $targetGrid.length && (
                 $targetGrid.hasClass('cfs-results-wrapper') ||
                 $targetGrid.hasClass('cfs-bricks-results-wrapper')
             );
 
+            // Check if this is a Bricks native loop (has children with data-cfs-post-id)
+            const isBricksNativeLoop = $targetGrid.length &&
+                !isCFSResultsElement &&
+                ($targetGrid.find('[data-cfs-post-id]').length > 0 ||
+                 $targetGrid.children('[class*="brxe-"]').length > 0);
+
             this.log('AJAX check:', {
                 enabled: settings.enable_ajax,
                 isCFSResults: isCFSResultsElement,
+                isBricksNativeLoop: isBricksNativeLoop,
                 targetFound: $targetGrid.length > 0
             });
 
-            // Use AJAX if enabled - we'll determine post_type in doAjaxFilter
-            if (settings.enable_ajax) {
-                this.doAjaxFilter(null, $facet, $targetGrid);
-            } else {
-                // URL-based filtering only when AJAX is disabled
+            if (!settings.enable_ajax) {
+                // URL-based filtering when AJAX is disabled
                 this.log('Using URL-based filtering (AJAX disabled in settings)');
                 this.doUrlFilter($facet);
+            } else if (isCFSResultsElement) {
+                // Full AJAX content replacement for CFS Results elements
+                this.doAjaxFilter(null, $facet, $targetGrid);
+            } else if (isBricksNativeLoop) {
+                // Client-side filtering for Bricks native loops (preserves styling)
+                this.doClientSideFilter($facet, $targetGrid);
+            } else {
+                // Fallback to AJAX content replacement
+                this.doAjaxFilter(null, $facet, $targetGrid);
+            }
+        },
+
+        /**
+         * Client-side filtering for Bricks native loops
+         * Gets matching post IDs via AJAX and shows/hides items (preserves Bricks styling)
+         */
+        doClientSideFilter: function($facet, $targetGrid) {
+            const self = this;
+
+            if (this.isLoading) {
+                return;
+            }
+
+            this.isLoading = true;
+            this.log('Starting client-side filter for Bricks loop');
+
+            // Show loading state
+            $targetGrid.addClass('cfs-loading');
+
+            // Get query settings from facet
+            let postType = $facet ? $facet.data('post-type') : null;
+            let postsPerPage = $facet ? $facet.data('posts-per-page') : null;
+
+            // Fallback to 'post' and -1 (all)
+            postType = postType || 'post';
+            postsPerPage = postsPerPage || -1;
+
+            // Gather filters
+            const filters = this.gatherFilters();
+            const filterString = $.param(filters);
+
+            this.log('Client-side filter request', {
+                postType: postType,
+                filters: filters
+            });
+
+            $.ajax({
+                url: this.config.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cfs_get_matching_ids',
+                    nonce: this.config.nonce,
+                    post_type: postType,
+                    posts_per_page: postsPerPage,
+                    filters: filterString
+                },
+                success: function(response) {
+                    self.log('Client-side filter response', response);
+
+                    if (response.success) {
+                        const matchingIds = response.data.post_ids || [];
+
+                        // Find all loop items and show/hide based on matching IDs
+                        const $items = $targetGrid.find('[data-cfs-post-id]');
+
+                        if ($items.length > 0) {
+                            // Items have post IDs - filter by ID
+                            $items.each(function() {
+                                const $item = $(this);
+                                const postId = parseInt($item.data('cfs-post-id'), 10);
+
+                                if (matchingIds.includes(postId)) {
+                                    $item.removeClass('cfs-hidden').show();
+                                } else {
+                                    $item.addClass('cfs-hidden').hide();
+                                }
+                            });
+                        } else {
+                            // No post IDs on items - try to match by index or show all
+                            const $children = $targetGrid.children('[class*="brxe-"]');
+
+                            if (matchingIds.length === 0) {
+                                // No matches - hide all
+                                $children.addClass('cfs-hidden').hide();
+                            } else {
+                                // Show all (can't filter by ID without data attribute)
+                                $children.removeClass('cfs-hidden').show();
+                            }
+                        }
+
+                        // Show no results message if needed
+                        self.handleNoResults($targetGrid, matchingIds.length);
+
+                        // Update count display
+                        const $countEl = $('.cfs-results-count');
+                        if ($countEl.length) {
+                            const countText = response.data.found_posts + ' ' +
+                                (response.data.found_posts === 1
+                                    ? (self.config.i18n.result || 'result')
+                                    : (self.config.i18n.results || 'results'));
+                            $countEl.html(countText);
+                        }
+
+                        // Update URL
+                        if (self.config.settings.ajax_url_update) {
+                            self.updateURL($facet);
+                        }
+
+                        // Trigger custom event
+                        $(document).trigger('cfs:filtered', [response.data, $targetGrid]);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('CFS Client-side Filter Error:', error);
+                },
+                complete: function() {
+                    self.isLoading = false;
+                    $targetGrid.removeClass('cfs-loading');
+                }
+            });
+        },
+
+        /**
+         * Handle no results message for client-side filtering
+         */
+        handleNoResults: function($container, matchCount) {
+            let $noResults = $container.find('.cfs-no-results-message');
+
+            if (matchCount === 0) {
+                if (!$noResults.length) {
+                    $noResults = $('<div class="cfs-no-results-message"><p>' +
+                        (this.config.i18n.noResults || 'No results found.') +
+                        '</p></div>');
+                    $container.append($noResults);
+                }
+                $noResults.show();
+            } else {
+                $noResults.hide();
             }
         },
 
