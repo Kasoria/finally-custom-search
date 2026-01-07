@@ -53,16 +53,20 @@ class CFS_Query {
             $should_filter = true;
         }
 
-        // Filter main query if we have CFS params
+        // Filter main query if we have CFS params - BUT only on archive pages, not singular pages
+        // On singular pages (like /contact/), the main query finds the page itself - we shouldn't modify it
         if ($query->is_main_query() && $has_cfs_params) {
-            $should_filter = true;
+            // Only filter main query on archive/post type archive pages, not singular pages
+            if ($query->is_archive() || $query->is_home() || $query->is_search()) {
+                $should_filter = true;
+            }
         }
 
-        // Also filter post type queries on frontend if we have CFS params
-        // This handles page builder loops (Bricks, Elementor, etc.)
+        // Filter secondary queries (page builder loops) on frontend if we have CFS params
+        // This handles page builder loops (Bricks, Elementor, etc.) on singular pages
         if ($has_cfs_params && !is_admin() && !$query->is_main_query()) {
             $post_type = $query->get('post_type');
-            // Filter if it's querying a specific post type (not just 'any' or pages)
+            // Filter if it's querying posts or custom post types (not pages, revisions, etc.)
             if (!empty($post_type) && $post_type !== 'page' && $post_type !== 'revision' && $post_type !== 'nav_menu_item') {
                 $should_filter = true;
             }

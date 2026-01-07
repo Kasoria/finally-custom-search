@@ -419,12 +419,32 @@
          * Perform URL-based filtering (page reload with filter params)
          */
         doUrlFilter: function($facet) {
-            const queryString = this.buildFilterQueryString($facet);
-            const currentUrl = window.location.pathname;
-            const newUrl = queryString ? currentUrl + '?' + queryString : currentUrl;
+            const filters = this.gatherFilters();
 
-            this.log('Redirecting to:', newUrl);
-            window.location.href = newUrl;
+            // Use the URL API for robust URL manipulation
+            const url = new URL(window.location.href);
+
+            // Remove existing cfs_ parameters
+            const keysToDelete = [];
+            url.searchParams.forEach((value, key) => {
+                if (key.startsWith('cfs_')) {
+                    keysToDelete.push(key);
+                }
+            });
+            keysToDelete.forEach(key => url.searchParams.delete(key));
+
+            // Add current filter values
+            Object.keys(filters).forEach(key => {
+                const value = filters[key];
+                if (Array.isArray(value)) {
+                    value.forEach(v => url.searchParams.append(key, v));
+                } else if (value !== '' && value !== null && value !== undefined) {
+                    url.searchParams.set(key, value);
+                }
+            });
+
+            this.log('Redirecting to:', url.toString());
+            window.location.href = url.toString();
         },
 
         /**
