@@ -57,6 +57,11 @@ class CFS_Bricks_Facet extends \Bricks\Element {
             'tab'   => 'content',
         ];
 
+        $this->control_groups['query'] = [
+            'title' => esc_html__('Query Settings', 'custom-facet-search'),
+            'tab'   => 'content',
+        ];
+
         $this->control_groups['labelStyle'] = [
             'title' => esc_html__('Label', 'custom-facet-search'),
             'tab'   => 'style',
@@ -120,6 +125,43 @@ class CFS_Bricks_Facet extends \Bricks\Element {
             'label'   => esc_html__('Show Label', 'custom-facet-search'),
             'type'    => 'checkbox',
             'default' => true,
+        ];
+
+        // === QUERY SETTINGS (for AJAX filtering with Bricks native loops) ===
+
+        // Get available post types
+        $post_types = get_post_types(['public' => true], 'objects');
+        $post_type_options = [];
+        foreach ($post_types as $post_type) {
+            if ($post_type->name !== 'attachment') {
+                $post_type_options[$post_type->name] = $post_type->label;
+            }
+        }
+
+        $this->controls['query_info'] = [
+            'tab'     => 'content',
+            'group'   => 'query',
+            'type'    => 'info',
+            'content' => esc_html__('Configure these settings to enable AJAX filtering with Bricks native loops. If using CFS Results element, these are optional.', 'custom-facet-search'),
+        ];
+
+        $this->controls['post_type'] = [
+            'tab'         => 'content',
+            'group'       => 'query',
+            'label'       => esc_html__('Post Type', 'custom-facet-search'),
+            'type'        => 'select',
+            'options'     => $post_type_options,
+            'placeholder' => esc_html__('Select post type', 'custom-facet-search'),
+        ];
+
+        $this->controls['posts_per_page'] = [
+            'tab'         => 'content',
+            'group'       => 'query',
+            'label'       => esc_html__('Posts Per Page', 'custom-facet-search'),
+            'type'        => 'number',
+            'min'         => 1,
+            'max'         => 100,
+            'placeholder' => '12',
         ];
 
         // === STYLE CONTROLS ===
@@ -306,9 +348,22 @@ class CFS_Bricks_Facet extends \Bricks\Element {
         $facet_slug = $settings['facet_slug'];
         $target_grid = $settings['target_grid'] ?? '';
         $show_label = isset($settings['show_label']) ? (bool) $settings['show_label'] : true;
+        $post_type = $settings['post_type'] ?? '';
+        $posts_per_page = $settings['posts_per_page'] ?? '';
 
         // Set root element attributes
         $this->set_attribute('_root', 'class', 'cfs-bricks-facet-wrapper');
+
+        // Add query data attributes for AJAX filtering
+        if (!empty($post_type)) {
+            $this->set_attribute('_root', 'data-post-type', $post_type);
+        }
+        if (!empty($posts_per_page)) {
+            $this->set_attribute('_root', 'data-posts-per-page', $posts_per_page);
+        }
+        if (!empty($target_grid)) {
+            $this->set_attribute('_root', 'data-target-grid', $target_grid);
+        }
 
         // Render the wrapper and facet
         echo "<div {$this->render_attributes('_root')}>";
@@ -316,6 +371,8 @@ class CFS_Bricks_Facet extends \Bricks\Element {
         echo CFS_Facets::instance()->render($facet_slug, [
             'show_label'  => $show_label,
             'target_grid' => $target_grid,
+            'post_type'   => $post_type,
+            'posts_per_page' => $posts_per_page,
         ]);
 
         echo '</div>';

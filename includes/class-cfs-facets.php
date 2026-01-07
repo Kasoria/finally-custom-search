@@ -74,27 +74,43 @@ class CFS_Facets {
             'class' => '',
             'show_label' => true,
             'target_grid' => '',
+            'post_type' => '',
+            'posts_per_page' => '',
         ];
-        
+
         $args = wp_parse_args($args, $defaults);
         $settings = $facet->settings;
-        
+
         // Get current filter values from URL
         $current_values = $this->get_current_values($facet);
-        
+
         // Build target selector
         $target_grid = $args['target_grid'];
-        
+        $post_type = $args['post_type'];
+        $posts_per_page = $args['posts_per_page'];
+
         // Build output
         ob_start();
-        
+
         $wrapper_class = 'cfs-facet cfs-facet-' . esc_attr($facet->type) . ' ' . esc_attr($args['class']);
+
+        // Build data attributes
+        $data_attrs = [
+            'data-facet="' . esc_attr($slug) . '"',
+            'data-type="' . esc_attr($facet->type) . '"',
+            'data-source="' . esc_attr($facet->source) . '"',
+        ];
+        if ($target_grid) {
+            $data_attrs[] = 'data-target-grid="' . esc_attr($target_grid) . '"';
+        }
+        if ($post_type) {
+            $data_attrs[] = 'data-post-type="' . esc_attr($post_type) . '"';
+        }
+        if ($posts_per_page) {
+            $data_attrs[] = 'data-posts-per-page="' . esc_attr($posts_per_page) . '"';
+        }
         ?>
-        <div class="<?php echo esc_attr(trim($wrapper_class)); ?>" 
-             data-facet="<?php echo esc_attr($slug); ?>"
-             data-type="<?php echo esc_attr($facet->type); ?>"
-             data-source="<?php echo esc_attr($facet->source); ?>"
-             <?php if ($target_grid): ?>data-target-grid="<?php echo esc_attr($target_grid); ?>"<?php endif; ?>>
+        <div class="<?php echo esc_attr(trim($wrapper_class)); ?>" <?php echo implode(' ', $data_attrs); ?>>
             
             <?php if ($args['show_label'] && !empty($settings['label'])): ?>
                 <label class="cfs-facet-label"><?php echo esc_html($settings['label']); ?></label>

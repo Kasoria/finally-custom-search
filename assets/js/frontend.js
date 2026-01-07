@@ -394,23 +394,37 @@
 
             this.log('Trigger filter, target grid:', $targetGrid.length ? 'found' : 'not found');
 
-            // Check if target has CFS data attributes (supports AJAX filtering)
-            const hasCfsAttributes = $targetGrid.length &&
-                ($targetGrid.hasClass('cfs-results-wrapper') ||
-                 $targetGrid.data('post-type') ||
-                 $targetGrid.find('.cfs-results-wrapper').length > 0);
+            // AJAX filtering ONLY works with CFS Results elements (our own controlled containers)
+            // For page builder native loops (Bricks, Elementor, etc.), we must use URL-based filtering
+            // because only PHP can modify their queries on page load
+            const isCFSResultsElement = $targetGrid.length && (
+                $targetGrid.hasClass('cfs-results-wrapper') ||
+                $targetGrid.hasClass('cfs-bricks-results-wrapper')
+            );
 
-            if (!settings.enable_ajax || !hasCfsAttributes) {
-                // Non-AJAX or no CFS wrapper: Update URL and reload page
-                // This allows native Bricks/Elementor loops to work via query modification
+            this.log('Target is CFS Results element:', isCFSResultsElement, 'AJAX enabled:', settings.enable_ajax);
+
+            if (settings.enable_ajax && isCFSResultsElement) {
+                // AJAX filtering - only for CFS Results elements
+                this.doAjaxFilter(null, $facet, $targetGrid);
+            } else {
+                // URL-based filtering for everything else (Bricks native loops, Elementor loops, etc.)
+                // This triggers a page reload with filter params, allowing PHP to modify the query
                 this.log('Using URL-based filtering (page reload)');
-                this.updateURL($facet);
-                window.location.search = this.buildFilterQueryString($facet);
-                return;
+                this.doUrlFilter($facet);
             }
+        },
 
-            // AJAX filtering
-            this.doAjaxFilter(null, $facet, $targetGrid);
+        /**
+         * Perform URL-based filtering (page reload with filter params)
+         */
+        doUrlFilter: function($facet) {
+            const queryString = this.buildFilterQueryString($facet);
+            const currentUrl = window.location.pathname;
+            const newUrl = queryString ? currentUrl + '?' + queryString : currentUrl;
+
+            this.log('Redirecting to:', newUrl);
+            window.location.href = newUrl;
         },
 
         /**
@@ -461,13 +475,22 @@
                 return;
             }
 
-            // Check if this wrapper supports AJAX filtering
-            if (!$resultsWrapper.data('post-type') && !$resultsWrapper.hasClass('cfs-results-wrapper')) {
-                this.log('Target does not support AJAX filtering, falling back to page reload');
-                this.updateURL($facet);
-                window.location.search = this.buildFilterQueryString($facet);
-                return;
+            // Get query settings from target grid OR from the triggering facet
+            let postType = $resultsWrapper.data('post-type');
+            let postsPerPage = $resultsWrapper.data('posts-per-page');
+            let template = $resultsWrapper.data('template') || '';
+
+            // If target doesn't have settings, try to get from facet
+            if (!postType && $facet) {
+                postType = $facet.data('post-type');
+                postsPerPage = $facet.data('posts-per-page') || postsPerPage;
             }
+
+            // Final fallback
+            postType = postType || 'post';
+            postsPerPage = postsPerPage || 12;
+
+            this.log('AJAX filter using postType:', postType, 'postsPerPage:', postsPerPage);
 
             this.isLoading = true;
 
@@ -477,14 +500,11 @@
             // Gather filter data from facets targeting this grid
             const gridId = $resultsWrapper.data('grid-id') || $resultsWrapper.attr('id') || $resultsWrapper.data('id');
             const filters = this.gatherFilters(gridId);
-            const postType = $resultsWrapper.data('post-type') || 'post';
-            const postsPerPage = $resultsWrapper.data('posts-per-page') || 12;
-            const template = $resultsWrapper.data('template') || '';
-            
+
             // Get sort order
             const sortVal = $('.cfs-sort-select').val() || 'date-DESC';
             const [orderby, order] = sortVal.split('-');
-            
+
             // Build filter string
             const filterString = $.param(filters);
 
