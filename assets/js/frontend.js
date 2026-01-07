@@ -156,7 +156,7 @@
          * Get the target grid for a facet
          */
         getTargetGrid: function($facet) {
-            const targetGrid = $facet.data('target-grid');
+            const targetGrid = $facet ? $facet.data('target-grid') : null;
 
             if (targetGrid) {
                 // Try to find by grid ID first
@@ -199,8 +199,21 @@
                 }
             }
 
-            // Default: find first results wrapper
-            return $('.cfs-results-wrapper, .cfs-bricks-results-wrapper').first();
+            // Try to find CFS results wrapper first
+            const $cfsWrapper = $('.cfs-results-wrapper, .cfs-bricks-results-wrapper').first();
+            if ($cfsWrapper.length) {
+                return $cfsWrapper;
+            }
+
+            // Fallback: use first detected grid (Bricks loop, Elementor loop, etc.)
+            const gridKeys = Object.keys(this.grids);
+            if (gridKeys.length > 0) {
+                this.log('Using auto-detected grid as target:', gridKeys[0]);
+                return this.grids[gridKeys[0]];
+            }
+
+            // No grid found
+            return $();
         },
         
         bindEvents: function() {
@@ -392,25 +405,26 @@
             // Get target grid from the triggering facet
             const $targetGrid = $facet ? this.getTargetGrid($facet) : $('.cfs-results-wrapper').first();
 
-            this.log('Trigger filter, target grid:', $targetGrid.length ? 'found' : 'not found');
+            this.log('Trigger filter, target grid:', $targetGrid.length ? 'found' : 'not found', $targetGrid);
 
-            // AJAX filtering ONLY works with CFS Results elements (our own controlled containers)
-            // For page builder native loops (Bricks, Elementor, etc.), we must use URL-based filtering
-            // because only PHP can modify their queries on page load
+            // Check for CFS Results elements
             const isCFSResultsElement = $targetGrid.length && (
                 $targetGrid.hasClass('cfs-results-wrapper') ||
                 $targetGrid.hasClass('cfs-bricks-results-wrapper')
             );
 
-            this.log('Target is CFS Results element:', isCFSResultsElement, 'AJAX enabled:', settings.enable_ajax);
+            this.log('AJAX check:', {
+                enabled: settings.enable_ajax,
+                isCFSResults: isCFSResultsElement,
+                targetFound: $targetGrid.length > 0
+            });
 
-            if (settings.enable_ajax && isCFSResultsElement) {
-                // AJAX filtering - only for CFS Results elements
+            // Use AJAX if enabled - we'll determine post_type in doAjaxFilter
+            if (settings.enable_ajax) {
                 this.doAjaxFilter(null, $facet, $targetGrid);
             } else {
-                // URL-based filtering for everything else (Bricks native loops, Elementor loops, etc.)
-                // This triggers a page reload with filter params, allowing PHP to modify the query
-                this.log('Using URL-based filtering (page reload)');
+                // URL-based filtering only when AJAX is disabled
+                this.log('Using URL-based filtering (AJAX disabled in settings)');
                 this.doUrlFilter($facet);
             }
         },
@@ -904,12 +918,15 @@
                 return $wrapper;
             }
 
-            // Fallback: look for first child with items
-            const $firstChild = $wrapper.children().first();
-            if ($firstChild.children().length > 0) {
-                return $firstChild;
+            // For Bricks loops detected via HTML comments, the wrapper IS the container
+            // Check if wrapper has children with brxe-* classes (loop items)
+            const $bricksItems = $wrapper.children('[class*="brxe-"]');
+            if ($bricksItems.length > 0) {
+                this.log('Using Bricks loop wrapper as container, items:', $bricksItems.length);
+                return $wrapper;
             }
 
+            // Fallback: use the wrapper itself
             return $wrapper;
         }
     };
