@@ -37,61 +37,119 @@
          */
         detectGrids: function() {
             this.grids = {};
+            const self = this;
 
             // Find all CFS result wrappers (native shortcode/widget)
-            $('.cfs-results-wrapper').each((i, el) => {
-                const $grid = $(el);
-                const gridId = $grid.data('grid-id') || $grid.attr('id');
-                if (gridId) {
-                    this.grids[gridId] = $grid;
-                }
+            $('.cfs-results-wrapper').each(function(i) {
+                const $grid = $(this);
+                const gridId = $grid.data('grid-id') || $grid.attr('id') || 'cfs-grid-' + i;
+                self.grids[gridId] = $grid;
+                self.log('Found CFS results wrapper:', gridId);
             });
 
             // Detect Elementor Loop Grids and other common grid widgets
-            $('[data-id]').each((i, el) => {
-                const $el = $(el);
+            $('[data-id]').each(function() {
+                const $el = $(this);
                 const elementorId = $el.data('id');
-                if (elementorId && !this.grids[elementorId]) {
-                    // Check if this is a loop grid, posts widget, or loop carousel
-                    const hasLoopContainer = $el.find('.elementor-loop-container, .elementor-posts-container, .elementor-grid, .e-loop-item, .elementor-widget-loop-grid').length;
+                if (elementorId && !self.grids[elementorId]) {
+                    const hasLoopContainer = $el.find('.elementor-loop-container, .elementor-posts-container, .elementor-grid, .e-loop-item').length;
                     const isLoopWidget = $el.hasClass('elementor-widget-loop-grid') || $el.hasClass('elementor-widget-posts');
 
                     if (hasLoopContainer || isLoopWidget) {
-                        this.grids[elementorId] = $el;
+                        self.grids[elementorId] = $el;
+                        self.log('Found Elementor grid:', elementorId);
                     }
                 }
             });
 
-            // Detect Bricks Builder query loops and grids
-            $('[data-query-loop-id], .brxe-loop, .brxe-posts').each((i, el) => {
-                const $el = $(el);
-                const bricksId = $el.attr('data-query-loop-id') || $el.attr('id') || 'bricks-grid-' + i;
-                if (!this.grids[bricksId]) {
-                    this.grids[bricksId] = $el;
+            // Detect Bricks Builder elements - multiple detection methods
+
+            // Method 1: Find Bricks loops by HTML comment markers
+            // Bricks uses <!--brx-loop-start-XXXXX--> comments
+            $('*').contents().filter(function() {
+                return this.nodeType === 8; // Comment nodes
+            }).each(function() {
+                const comment = this.nodeValue || '';
+                const match = comment.match(/brx-loop-start-([a-z0-9]+)/i);
+                if (match) {
+                    const loopId = match[1];
+                    const $container = $(this).parent();
+                    if (!self.grids[loopId]) {
+                        self.grids[loopId] = $container;
+                        self.log('Found Bricks loop via comment:', loopId);
+                    }
+                }
+            });
+
+            // Method 2: Find containers with repeating brxe-* children (loop items)
+            $('.brxe-container, .brxe-div, .brxe-block').each(function(i) {
+                const $el = $(this);
+                const $children = $el.children('[class*="brxe-"]');
+
+                // Check if children have repeating class patterns (indicates a loop)
+                if ($children.length > 1) {
+                    const firstChildClasses = $children.first().attr('class') || '';
+                    const classMatch = firstChildClasses.match(/brxe-([a-z0-9]+)/i);
+
+                    if (classMatch) {
+                        const itemClass = 'brxe-' + classMatch[1];
+                        const sameClassChildren = $children.filter('.' + itemClass);
+
+                        // If multiple children have the same brxe-* class, it's likely a loop
+                        if (sameClassChildren.length > 1) {
+                            const loopId = classMatch[1];
+                            if (!self.grids[loopId]) {
+                                self.grids[loopId] = $el;
+                                self.log('Found Bricks loop via repeating children:', loopId, 'items:', sameClassChildren.length);
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Method 3: Query loops with data attribute
+            $('[data-query-loop-id], [data-query-element-id]').each(function(i) {
+                const $el = $(this);
+                const loopId = $el.attr('data-query-loop-id') || $el.attr('data-query-element-id');
+                if (loopId && !self.grids[loopId]) {
+                    self.grids[loopId] = $el;
+                    self.log('Found Bricks query loop via data attr:', loopId);
+                }
+            });
+
+            // Method 4: Bricks sections/containers that might be grids
+            $('.brxe-section, .brxe-container').each(function(i) {
+                const $el = $(this);
+                const id = $el.attr('id');
+                // Only add if it has an explicit ID (user-defined)
+                if (id && !self.grids[id]) {
+                    self.grids[id] = $el;
+                    self.log('Found Bricks section/container with ID:', id);
                 }
             });
 
             // Also detect by common CSS selectors used by page builders
             const commonSelectors = [
-                '.jet-listing-grid',        // JetEngine
-                '.wpgb-grid-wrapper',       // WP Grid Builder
-                '[data-loop-grid]',         // Generic loop grid
-                '.elementor-posts',         // Elementor Posts widget
-                '.elementor-loop-container', // Elementor Loop
-                '.cfs-bricks-results-wrapper' // CFS Bricks Results
+                '.cfs-bricks-results-wrapper', // CFS Bricks Results
+                '.jet-listing-grid',           // JetEngine
+                '.wpgb-grid-wrapper',          // WP Grid Builder
+                '[data-loop-grid]',            // Generic loop grid
+                '.elementor-posts',            // Elementor Posts widget
+                '.elementor-loop-container'    // Elementor Loop
             ];
 
-            commonSelectors.forEach(selector => {
-                $(selector).each((i, el) => {
-                    const $el = $(el);
-                    const id = $el.attr('id') || $el.data('id') || 'grid-' + i;
-                    if (!this.grids[id]) {
-                        this.grids[id] = $el;
+            commonSelectors.forEach(function(selector) {
+                $(selector).each(function(i) {
+                    const $el = $(this);
+                    const id = $el.attr('id') || $el.data('grid-id') || $el.data('id') || selector.replace(/[^a-z]/gi, '') + '-' + i;
+                    if (!self.grids[id]) {
+                        self.grids[id] = $el;
+                        self.log('Found grid via selector:', selector, id);
                     }
                 });
             });
 
-            this.log('Detected grids:', Object.keys(this.grids));
+            this.log('Total detected grids:', Object.keys(this.grids).length, Object.keys(this.grids));
         },
         
         /**
@@ -330,36 +388,92 @@
         triggerFilter: function($facet) {
             const self = this;
             const settings = this.config.settings || {};
-            
+
             // Get target grid from the triggering facet
             const $targetGrid = $facet ? this.getTargetGrid($facet) : $('.cfs-results-wrapper').first();
-            
-            if (!settings.enable_ajax) {
-                // Non-AJAX: Submit form or update URL and reload
+
+            this.log('Trigger filter, target grid:', $targetGrid.length ? 'found' : 'not found');
+
+            // Check if target has CFS data attributes (supports AJAX filtering)
+            const hasCfsAttributes = $targetGrid.length &&
+                ($targetGrid.hasClass('cfs-results-wrapper') ||
+                 $targetGrid.data('post-type') ||
+                 $targetGrid.find('.cfs-results-wrapper').length > 0);
+
+            if (!settings.enable_ajax || !hasCfsAttributes) {
+                // Non-AJAX or no CFS wrapper: Update URL and reload page
+                // This allows native Bricks/Elementor loops to work via query modification
+                this.log('Using URL-based filtering (page reload)');
                 this.updateURL($facet);
-                window.location.href = window.location.href;
+                window.location.search = this.buildFilterQueryString($facet);
                 return;
             }
-            
+
             // AJAX filtering
             this.doAjaxFilter(null, $facet, $targetGrid);
         },
-        
+
+        /**
+         * Build query string from current filters
+         */
+        buildFilterQueryString: function($facet) {
+            const filters = this.gatherFilters();
+            const params = new URLSearchParams(window.location.search);
+
+            // Remove existing cfs_ parameters
+            const keysToDelete = [];
+            params.forEach((value, key) => {
+                if (key.startsWith('cfs_')) {
+                    keysToDelete.push(key);
+                }
+            });
+            keysToDelete.forEach(key => params.delete(key));
+
+            // Add current filter values
+            Object.keys(filters).forEach(key => {
+                const value = filters[key];
+                if (Array.isArray(value)) {
+                    value.forEach(v => params.append(key, v));
+                } else if (value !== '' && value !== null && value !== undefined) {
+                    params.set(key, value);
+                }
+            });
+
+            return params.toString();
+        },
+
         doAjaxFilter: function(page, $facet, $targetGrid) {
             const self = this;
-            
+
             // Use provided grid or find from facet or default
-            const $resultsWrapper = $targetGrid || ($facet ? this.getTargetGrid($facet) : null) || $('.cfs-results-wrapper').first();
-            
+            let $resultsWrapper = $targetGrid || ($facet ? this.getTargetGrid($facet) : null) || $('.cfs-results-wrapper').first();
+
+            // If target doesn't have CFS attributes, try to find a CFS wrapper inside it
+            if ($resultsWrapper.length && !$resultsWrapper.hasClass('cfs-results-wrapper')) {
+                const $innerWrapper = $resultsWrapper.find('.cfs-results-wrapper');
+                if ($innerWrapper.length) {
+                    $resultsWrapper = $innerWrapper;
+                }
+            }
+
             if (this.isLoading || !$resultsWrapper.length) {
+                this.log('Cannot perform AJAX filter - no valid results wrapper found');
                 return;
             }
-            
+
+            // Check if this wrapper supports AJAX filtering
+            if (!$resultsWrapper.data('post-type') && !$resultsWrapper.hasClass('cfs-results-wrapper')) {
+                this.log('Target does not support AJAX filtering, falling back to page reload');
+                this.updateURL($facet);
+                window.location.search = this.buildFilterQueryString($facet);
+                return;
+            }
+
             this.isLoading = true;
-            
+
             // Show loading state
             $resultsWrapper.addClass('cfs-loading');
-            
+
             // Gather filter data from facets targeting this grid
             const gridId = $resultsWrapper.data('grid-id') || $resultsWrapper.attr('id') || $resultsWrapper.data('id');
             const filters = this.gatherFilters(gridId);

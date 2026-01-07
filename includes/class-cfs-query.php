@@ -35,12 +35,46 @@ class CFS_Query {
         if (is_admin() && !wp_doing_ajax()) {
             return;
         }
-        
-        // Only modify main query or queries with cfs_filter flag
-        if (!$query->is_main_query() && !$query->get('cfs_filter')) {
+
+        // Check if we have any CFS filter parameters in the URL
+        $has_cfs_params = false;
+        foreach ($_GET as $key => $value) {
+            if (strpos($key, 'cfs_') === 0) {
+                $has_cfs_params = true;
+                break;
+            }
+        }
+
+        // Determine if we should filter this query
+        $should_filter = false;
+
+        // Always filter queries explicitly flagged with cfs_filter (our AJAX queries)
+        if ($query->get('cfs_filter')) {
+            $should_filter = true;
+        }
+
+        // Filter main query if we have CFS params
+        if ($query->is_main_query() && $has_cfs_params) {
+            $should_filter = true;
+        }
+
+        // Also filter post type queries on frontend if we have CFS params
+        // This handles page builder loops (Bricks, Elementor, etc.)
+        if ($has_cfs_params && !is_admin() && !$query->is_main_query()) {
+            $post_type = $query->get('post_type');
+            // Filter if it's querying a specific post type (not just 'any' or pages)
+            if (!empty($post_type) && $post_type !== 'page' && $post_type !== 'revision' && $post_type !== 'nav_menu_item') {
+                $should_filter = true;
+            }
+        }
+
+        // Allow filtering via hook
+        $should_filter = apply_filters('cfs_should_filter_query', $should_filter, $query, $has_cfs_params);
+
+        if (!$should_filter) {
             return;
         }
-        
+
         // Get all facet parameters
         $this->active_filters = $this->get_active_filters();
 
